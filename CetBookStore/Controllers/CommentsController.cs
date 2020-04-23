@@ -10,24 +10,23 @@ using CetBookStore.Models;
 
 namespace CetBookStore.Controllers
 {
-    public class CategoriesController : Controller
+    public class CommentsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CommentsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Comments
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories.ToListAsync();
-            
-            return View(categories);
+            var applicationDbContext = _context.Comments.Include(c => c.Book);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: Comments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,39 +34,42 @@ namespace CetBookStore.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.Include(c => c.Books)
+            var comment = await _context.Comments
+                .Include(c => c.Book)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(comment);
         }
 
-        // GET: Categories/Create
+        // GET: Comments/Create
         public IActionResult Create()
         {
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Title");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Comments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Title,Detail,Rating,CreatedDate,BookId")] Comment comment)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(comment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Title", comment.BookId);
+            return View(comment);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Comments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,22 +77,23 @@ namespace CetBookStore.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var comment = await _context.Comments.FindAsync(id);
+            if (comment == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Title", comment.BookId);
+            return View(comment);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Comments/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Detail,Rating,CreatedDate,BookId")] Comment comment)
         {
-            if (id != category.Id)
+            if (id != comment.Id)
             {
                 return NotFound();
             }
@@ -99,12 +102,12 @@ namespace CetBookStore.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!CommentExists(comment.Id))
                     {
                         return NotFound();
                     }
@@ -115,10 +118,11 @@ namespace CetBookStore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Title", comment.BookId);
+            return View(comment);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Comments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,30 +130,31 @@ namespace CetBookStore.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var comment = await _context.Comments
+                .Include(c => c.Book)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(comment);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Comments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
+            var comment = await _context.Comments.FindAsync(id);
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool CommentExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Comments.Any(e => e.Id == id);
         }
     }
 }
