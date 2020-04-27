@@ -16,4 +16,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="wwwroot\UserImages\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="wwwroot\UserImages\02dd51ad-2853-4b55-a0f1-6fa11fbeb0c9_cshparbook.jpg" />
+  </ItemGroup>
+
 </Project>

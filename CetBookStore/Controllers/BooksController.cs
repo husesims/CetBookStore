@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CetBookStore.Data;
 using CetBookStore.Models;
+using CetBookStore.ViewModel;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace CetBookStore.Controllers
 {
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment hostEnvironment;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            this.hostEnvironment = hostEnvironment;
         }
 
         // GET: Books
@@ -25,7 +30,46 @@ namespace CetBookStore.Controllers
             var applicationDbContext = _context.Books.Include(b => b.Category);
             return View(await applicationDbContext.ToListAsync());
         }
+        public async Task<IActionResult> UploadImage(ImageUploadViewModel uploadModel)
+        {
 
+            //string directory= @"C:\Users\Huseyin\source\repos\CetBookStore\CetBookStore\wwwroot\UserImages\";
+            string directory = Path.Combine(hostEnvironment.WebRootPath, "UserImages");
+            string fileName = Guid.NewGuid().ToString() +"_" + uploadModel.ImageFile.FileName;
+
+            string fullPath = Path.Combine(directory, fileName);
+
+            using(var fileStream=new FileStream(fullPath, FileMode.Create))
+            {
+                await uploadModel.ImageFile.CopyToAsync(fileStream);
+            }
+
+            BookImage bookImage = new BookImage();
+            bookImage.BookId = uploadModel.BookId;
+            bookImage.FileName = fileName;
+
+            _context.BookImages.Add(bookImage);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(ManageImage), new { id = uploadModel.BookId });
+
+
+        }
+        public async Task<IActionResult> ManageImage(int? id)
+        {
+            if(id ==null)
+            {
+                return BadRequest();
+            }
+
+            var book = await _context.Books.Include(b => b.BookImages)               
+                .FirstOrDefaultAsync(b=>b.Id== id);
+            if(book==null)
+            {
+                return NotFound();
+            }
+            return View(book);
+        }
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {

@@ -37,5 +37,7 @@ namespace CetBookStore.Models
           //  double result = 4.0 / 2.0; //2.0000000000000000000000001 1.9999999999999999999999998
         }
 
+        public virtual List<BookImage> BookImages { get; set; }
+
     }
 }
