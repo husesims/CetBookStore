@@ -15,6 +15,12 @@ namespace CetBookStore.ViewModel
         [Display(Name ="Kategori Seçimi")]
         public int? CategoryId { get; set; }
 
+        [Display(Name = "En Düşük")]
+        public Decimal? MinPrice { get; set; }
+
+        [Display(Name = "En Yüksek")]
+        public Decimal? MaxPrice { get; set; }
+
         public List<Models.Book> Results { get; set; }
     }
 }

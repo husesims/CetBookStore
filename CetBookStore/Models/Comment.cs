@@ -16,5 +16,8 @@ namespace CetBookStore.Models
 
         public int BookId { get; set; }
         public Book Book { get; set; }
+
+        public int CetStoreUserId { get; set; }
+        public virtual CetStoreUser CetStoreUser { get; set; }
     }
 }

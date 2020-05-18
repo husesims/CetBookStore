@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CetBookStore.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<CetStoreUser,CetStoreRole,int>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Book> Books { get; set; }

@@ -17,10 +17,17 @@ namespace CetBookStore.ViewComponents
             this.context = context;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public async Task<IViewComponentResult> InvokeAsync(bool forSearch=false)
         {
             var cats = await context.Categories.ToListAsync();
-            return View(cats);
+            if (forSearch)
+            {
+                return View("ForSearch",cats);
+            }
+            else
+            {
+                return View(cats);
+            }
         }
     }
 }
